@@ -31,6 +31,12 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    background-color: #0080FF;
+    color: white;
+}
+
+button:hover {
+    background-color: #0056b3;
 }
 
 table {
@@ -46,9 +52,17 @@ th, td {
 
 th {
     background-color: #0080FF;
+    color: white;
 }
 
 #total-estoque {
     margin-top: 20px;
 }
 
+#limpar-tabela {
+    background-color: #dc3545;
+}
+
+#limpar-tabela:hover {
+    background-color: #bd2130;
+}

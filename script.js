@@ -1,91 +1,99 @@
 
 class Produto {
+    #preco;
+    #quantidade;
 
     constructor(nome, preco, quantidade) {
-        this.nome = nome;
-        this.preco = preco;
-        this.quantidade = quantidade;
+        if (!nome || nome.trim() === "") {
+            throw new Error("O nome do produto não pode estar em branco!");
+        }
+
+        if (isNaN(preco) || preco <= 0) {
+            throw new Error("O preço deve ser maior que zero (R$ 0,00)!");
+        }
+
+        if (isNaN(quantidade) || quantidade <= 0) {
+            throw new Error("A quantidade deve ser maior que zero!");
+        }
+
+        this.nome = nome.trim();
+        this.#preco = preco;
+        this.#quantidade = quantidade;
+    }
+
+    get preco() {
+        return this.#preco;
+    }
+
+    get quantidade() {
+        return this.#quantidade;
     }
 
     calcularSubtotal() {
-        return this.preco * this.quantidade;
+        return this.#preco * this.#quantidade;
     }
 }
 
-
-// Lista de produtos
 var listaDeProdutos = [];
 
-
-// Formulário
 var formulario = document.getElementById("form-produto");
 
-
-// Cadastrar produto
 formulario.addEventListener("submit", function (event) {
-
     event.preventDefault();
 
     var nome = document.getElementById("nome").value;
     var preco = Number(document.getElementById("preco").value);
     var quantidade = Number(document.getElementById("quantidade").value);
 
-    var produto = new Produto(nome, preco, quantidade);
+    try {
+        var produto = new Produto(nome, preco, quantidade);
+        listaDeProdutos.push(produto);
 
-    listaDeProdutos.push(produto);
-
-    mostrarProdutos();
-
-    formulario.reset();
-
+        mostrarProdutos();
+        formulario.reset();
+    } catch (erro) {
+        alert(erro.message);
+    }
 });
 
-
-// Mostrar produtos na tabela
 function mostrarProdutos() {
-
     var tabela = document.getElementById("tabela-produtos");
-
     tabela.innerHTML = "";
 
     for (var i = 0; i < listaDeProdutos.length; i++) {
-
         var produto = listaDeProdutos[i];
 
         tabela.innerHTML += `
-    
+     
                 <td>${produto.nome}</td>
-                <td>R$ ${produto.preco.toFixed(2)}</td>
+                <td>R$ ${produto.preco.toFixed(2).replace(".", ",")}</td>
                 <td>${produto.quantidade}</td>
-                <td>R$ ${produto.calcularSubtotal().toFixed(2)}</td>
-           
-    `;
+                <td>R$ ${produto.calcularSubtotal().toFixed(2).replace(".", ",")}</td>
+                <td>
+                    <button onclick="removerProduto(${i})">Remover</button>
+                </td>
+          
+        `;
     }
 
     atualizarTotalEstoque();
 }
 
+function removerProduto(index) {
+    listaDeProdutos.splice(index, 1);
+    mostrarProdutos();
+}
 
-// Calcular total do estoque
 function atualizarTotalEstoque() {
-
-    var total = listaDeProdutos.reduce(function (total, produto) {
-
-        return total + produto.calcularSubtotal();
-
+    var total = listaDeProdutos.reduce(function (acumulador, produto) {
+        return acumulador + produto.calcularSubtotal();
     }, 0);
 
     document.getElementById("total-estoque").innerText =
-        "Total do estoque: R$ " + total.toFixed(2);
+        "Total do estoque: R$ " + total.toFixed(2).replace(".", ",");
 }
 
-
-// Botão limpar estoque
 document.getElementById("limpar-tabela").addEventListener("click", function () {
-
     listaDeProdutos.length = 0;
-
     mostrarProdutos();
-
 });
-
