@@ -64,15 +64,15 @@ function mostrarProdutos() {
         var produto = listaDeProdutos[i];
 
         tabela.innerHTML += `
-     
+            <tr>
                 <td>${produto.nome}</td>
                 <td>R$ ${produto.preco.toFixed(2).replace(".", ",")}</td>
                 <td>${produto.quantidade}</td>
                 <td>R$ ${produto.calcularSubtotal().toFixed(2).replace(".", ",")}</td>
                 <td>
-                    <button onclick="removerProduto(${i})">Remover</button>
+                    <button class="btn-remover" onclick="removerProduto(${i})">Remover</button>
                 </td>
-          
+            </tr>
         `;
     }
 

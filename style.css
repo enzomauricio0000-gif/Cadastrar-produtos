@@ -1,29 +1,44 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #dddddd;
+    background-color: #090205;
+    color: #ffffff;
     margin: 30px;
 }
 
 h1 {
     text-align: center;
+    color: #ffffff;
 }
 
 h2 {
     margin-top: 30px;
+    color: #ffffff;
 }
 
 form {
-    background-color: white;
+    background-color: #270a16;
     padding: 20px;
     border-radius: 10px;
     width: 400px;
     margin: auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+label {
+    display: block;
+    margin-top: 10px;
+    color: #ffffff;
 }
 
 input {
     padding: 8px;
     margin-top: 5px;
-    width: 90%;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #51111f;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #000000;
 }
 
 button {
@@ -31,38 +46,61 @@ button {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #0080FF;
+    background-color: #922235;
     color: white;
+    font-weight: bold;
+    transition: background-color 0.3s;
+    margin-top: 15px;
+    width: 100%;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #452635;
 }
 
 table {
     width: 100%;
-    background-color: white;
+    background-color: #270a16;
     border-collapse: collapse;
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 th, td {
     padding: 10px;
     text-align: center;
+    border: 1px solid #51111f;
 }
 
 th {
-    background-color: #0080FF;
+    background-color: #922235;
     color: white;
 }
 
 #total-estoque {
     margin-top: 20px;
+    font-weight: bold;
+    color: #ffffff;
 }
 
 #limpar-tabela {
-    background-color: #dc3545;
+    background-color: #51111f;
+    width: auto;
+    margin-top: 10px;
 }
 
 #limpar-tabela:hover {
-    background-color: #bd2130;
+    background-color: #270a16;
+}
+
+.btn-remover {
+    background-color: #51111f;
+    width: auto;
+    padding: 6px 12px;
+    margin-top: 0;
+}
+
+.btn-remover:hover {
+    background-color: #922235;
 }
