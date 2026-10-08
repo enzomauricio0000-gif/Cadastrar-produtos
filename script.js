@@ -1,99 +1,104 @@
+// Array para armazenar os produtos
+let produtos = [];
 
-class Produto {
-    #preco;
-    #quantidade;
+// Elementos do DOM
+const formProduto = document.getElementById("form-produto");
+const listaProdutos = document.getElementById("lista-produtos");
+const areaEtiqueta = document.getElementById("area-etiqueta");
+const qrcodeContainer = document.getElementById("qrcode");
 
-    constructor(nome, preco, quantidade) {
-        if (!nome || nome.trim() === "") {
-            throw new Error("O nome do produto não pode estar em branco!");
-        }
-
-        if (isNaN(preco) || preco <= 0) {
-            throw new Error("O preço deve ser maior que zero (R$ 0,00)!");
-        }
-
-        if (isNaN(quantidade) || quantidade <= 0) {
-            throw new Error("A quantidade deve ser maior que zero!");
-        }
-
-        this.nome = nome.trim();
-        this.#preco = preco;
-        this.#quantidade = quantidade;
+// Carregar produtos do localStorage ao iniciar
+window.onload = function() {
+    const produtosSalvos = localStorage.getItem("produtos");
+    if (produtosSalvos) {
+        produtos = JSON.parse(produtosSalvos);
+        renderizarTabela();
     }
+};
 
-    get preco() {
-        return this.#preco;
-    }
-
-    get quantidade() {
-        return this.#quantidade;
-    }
-
-    calcularSubtotal() {
-        return this.#preco * this.#quantidade;
-    }
-}
-
-var listaDeProdutos = [];
-
-var formulario = document.getElementById("form-produto");
-
-formulario.addEventListener("submit", function (event) {
+// Evento de submissão do formulário (RF: Persistência de Dados)
+formProduto.addEventListener("submit", function(event) {
     event.preventDefault();
 
-    var nome = document.getElementById("nome").value;
-    var preco = Number(document.getElementById("preco").value);
-    var quantidade = Number(document.getElementById("quantidade").value);
+    const nome = document.getElementById("nome").value;
+    const preco = parseFloat(document.getElementById("preco").value);
 
-    try {
-        var produto = new Produto(nome, preco, quantidade);
-        listaDeProdutos.push(produto);
+    const novoProduto = {
+        id: Date.now(), // ID único baseado no timestamp
+        nome: nome,
+        preco: preco
+    };
 
-        mostrarProdutos();
-        formulario.reset();
-    } catch (erro) {
-        alert(erro.message);
-    }
+    produtos.push(novoProduto);
+    salvarNoLocalStorage();
+    renderizarTabela();
+    
+    formProduto.reset();
 });
 
-function mostrarProdutos() {
-    var tabela = document.getElementById("tabela-produtos");
-    tabela.innerHTML = "";
+// Salvar no localStorage (RF)
+function salvarNoLocalStorage() {
+    localStorage.setItem("produtos", JSON.stringify(produtos));
+}
 
-    for (var i = 0; i < listaDeProdutos.length; i++) {
-        var produto = listaDeProdutos[i];
+// Renderizar lista na tabela
+function renderizarTabela() {
+    listaProdutos.innerHTML = "";
 
-        tabela.innerHTML += `
-            <tr>
-                <td>${produto.nome}</td>
-                <td>R$ ${produto.preco.toFixed(2).replace(".", ",")}</td>
-                <td>${produto.quantidade}</td>
-                <td>R$ ${produto.calcularSubtotal().toFixed(2).replace(".", ",")}</td>
-                <td>
-                    <button class="btn-remover" onclick="removerProduto(${i})">Remover</button>
-                </td>
-            </tr>
+    produtos.forEach((produto) => {
+        const tr = document.createElement("tr");
+
+        tr.innerHTML = `
+            <td>${produto.nome}</td>
+            <td>R$ ${produto.preco.toFixed(2)}</td>
+            <td>
+                <button onclick="gerarEtiqueta(${produto.id})">🏷️ Gerar QR Code</button>
+                <button onclick="removerProduto(${produto.id})">❌ Eliminar</button>
+            </td>
         `;
-    }
 
-    atualizarTotalEstoque();
+        listaProdutos.appendChild(tr);
+    });
 }
 
-function removerProduto(index) {
-    listaDeProdutos.splice(index, 1);
-    mostrarProdutos();
+// RF: Geração de QR Code e Etiqueta por Produto
+function gerarEtiqueta(id) {
+    const produto = produtos.find(p => p.id === id);
+    if (!produto) return;
+
+    // Atualiza os dados da etiqueta
+    document.getElementById("etiqueta-nome").innerText = `Produto: ${produto.nome}`;
+    document.getElementById("etiqueta-preco").innerText = `Preço: R$ ${produto.preco.toFixed(2)}`;
+
+    // Limpa o QR Code anterior
+    qrcodeContainer.innerHTML = "";
+
+    // Conteúdo gravado dentro do QR Code
+    const dadosQRCode = JSON.stringify({
+        id: produto.id,
+        nome: produto.nome,
+        preco: produto.preco
+    });
+
+    // Cria o novo QR Code
+    new QRCode(qrcodeContainer, {
+        text: dadosQRCode,
+        width: 128,
+        height: 128
+    });
+
+    areaEtiqueta.style.display = "block";
 }
 
-function atualizarTotalEstoque() {
-    var total = listaDeProdutos.reduce(function (acumulador, produto) {
-        return acumulador + produto.calcularSubtotal();
-    }, 0);
-
-    document.getElementById("total-estoque").innerText =
-        "Total do estoque: R$ " + total.toFixed(2).replace(".", ",");
+// Função do Botão de Impressão da Etiqueta
+function imprimirEtiqueta() {
+    window.print();
 }
 
-document.getElementById("limpar-tabela").addEventListener("click", function () {
-    listaDeProdutos.length = 0;
-    mostrarProdutos();
-});
+// Remover Produto
+function removerProduto(id) {
+    produtos = produtos.filter(p => p.id !== id);
+    salvarNoLocalStorage();
+    renderizarTabela();
+    areaEtiqueta.style.display = "none";
+}
